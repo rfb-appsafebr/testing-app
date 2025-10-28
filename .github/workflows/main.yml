@@ -1,0 +1,50 @@
+# .github/workflows/socket-scan.yml
+name: Socket Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  socket-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Socket CLI
+        run: npm install -g socket
+
+      - name: Run Socket scan
+        env:
+          SOCKET_SECURITY_API_TOKEN: ${{ secrets.SOCKET_SECURITY_API_TOKEN }}
+          SOCKET_ORG_SLUG: ${{ vars.SOCKET_ORG_SLUG }}
+        run: |
+          if [ -z "${SOCKET_SECURITY_API_TOKEN}" ]; then
+            echo "::error::Missing SOCKET_SECURITY_API_TOKEN secret"
+            exit 1
+          fi
+
+          # Run reachability scan
+          socket scan create \
+            --reach \
+            --org "${SOCKET_ORG_SLUG}" \
+            --repo "${GITHUB_REPOSITORY##*/}" \
+            --branch "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" \
+            --json \
+            .
+
+      - name: Upload scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: socket-scan-report
+          path: socket-scan-report.json
+          if-no-files-found: ignore
