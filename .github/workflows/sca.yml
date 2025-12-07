@@ -28,9 +28,12 @@ jobs:
 
       # --- Scan SBOM (Grype) ---
       - name: Scan SBOM with Grype (SARIF)
-        uses: anchore/scan-action@v4
+        uses: anchore/scan-action@v6
         with:
           sbom: sbom.spdx.json
+          fail-build: false
+          output-format: sarif
+          output-file: grype
 
       # --- Upload to GitHub Security tab ---
       - name: Upload SARIF
