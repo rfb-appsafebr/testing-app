@@ -22,7 +22,7 @@ jobs:
         with:
           project: "${{ github.repository }}"
           path: "."
-          format: "HTML,JSON,XML"
+          format: "JSON"
           out: "dependency-check-report"
           args: >
             --nvdValidForHours 24
