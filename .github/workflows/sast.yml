@@ -20,22 +20,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      # (Opcional) Instalar cosign para validar assinatura do binário
-      # - name: Install cosign
-      #   uses: sigstore/cosign-installer@v3
-
       - name: Install OpenGrep
         run: |
           curl -fsSL https://raw.githubusercontent.com/opengrep/opengrep/main/install.sh | bash
           echo "$HOME/.opengrep/cli/latest" >> $GITHUB_PATH
-          opengrep --version
+
+      - name: OpenGrep version
+        run: opengrep --version
 
       - name: Run OpenGrep (SARIF)
         run: |
           mkdir -p reports
-          # Ajuste -f para seu ruleset:
-          #   -f rules            (pasta com regras YAML)
-          #   -f .semgrep.yml     (arquivo único)
           opengrep scan --metrics=off --sarif-output=reports/opengrep.sarif -f rules .
 
       - name: Upload SARIF to GitHub Code Scanning
