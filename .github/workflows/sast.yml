@@ -1,10 +1,10 @@
 name: SAST - OpenGrep
 
 on:
-  pull_request:
+  pull_request: {}
   push:
-    branches: ["master"]
-  workflow_dispatch:
+    branches: ["main", "master"]
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -20,27 +20,29 @@ jobs:
         with:
           fetch-depth: 0
 
+      # (Opcional) Instalar cosign para validar assinatura do binário
+      # - name: Install cosign
+      #   uses: sigstore/cosign-installer@v3
+
       - name: Install OpenGrep
         run: |
           curl -fsSL https://raw.githubusercontent.com/opengrep/opengrep/main/install.sh | bash
+          echo "$HOME/.opengrep/cli/latest" >> $GITHUB_PATH
           opengrep --version
-        # install.sh e comando opengrep scan estão no README oficial :contentReference[oaicite:0]{index=0}
 
       - name: Run OpenGrep (SARIF)
         run: |
           mkdir -p reports
-          # Ajuste o -f para seu diretório/arquivo de regras:
-          #   -f rules                (pasta com *.yml)
-          #   -f .semgrep.yml         (arquivo único)
+          # Ajuste -f para seu ruleset:
+          #   -f rules            (pasta com regras YAML)
+          #   -f .semgrep.yml     (arquivo único)
           opengrep scan --metrics=off --sarif-output=reports/opengrep.sarif -f rules .
-        # Exemplo de SARIF output no README :contentReference[oaicite:1]{index=1}
 
-      - name: Upload SARIF to Code Scanning
+      - name: Upload SARIF to GitHub Code Scanning
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: reports/opengrep.sarif
-        # v4 é a linha atual; v3 entrou em depreciação :contentReference[oaicite:2]{index=2}
 
       - name: Upload artifacts
         if: always()
