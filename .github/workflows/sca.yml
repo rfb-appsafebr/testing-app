@@ -32,7 +32,6 @@ jobs:
         with:
           sbom: sbom.spdx.json
           fail-build: false
-          severity-cutoff: critical
 
       # --- Upload to GitHub Security tab ---
       - name: Upload SARIF
