@@ -1,4 +1,4 @@
-name: SCA - OWASP Dependency-Check
+name: SCA - OWASP Dependency-Check (download DB)
 
 on:
   pull_request:
@@ -12,20 +12,22 @@ permissions:
 jobs:
   dependency-check:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run OWASP Dependency-Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: "${{ github.repository }}"
-          path: "."
-          format: "JSON"
-          out: "dependency-check-report"
-          args: >
-            --data ~/.dependency-check
+      - name: Run Dependency-Check (CLI via Docker)
+        run: |
+          mkdir -p .dc-data dependency-check-report
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/src" \
+            -v "${GITHUB_WORKSPACE}/.dc-data:/usr/share/dependency-check/data" \
+            owasp/dependency-check:latest \
+            --project "${GITHUB_REPOSITORY}" \
+            --scan /src \
+            --format JSON \
+            --out /src/dependency-check-report \
+            --data /usr/share/dependency-check/data
 
       - name: Upload reports
         if: always()
