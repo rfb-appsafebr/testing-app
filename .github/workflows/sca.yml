@@ -31,7 +31,6 @@ jobs:
         uses: anchore/scan-action@v4
         with:
           sbom: sbom.spdx.json
-          fail-build: false
 
       # --- Upload to GitHub Security tab ---
       - name: Upload SARIF
