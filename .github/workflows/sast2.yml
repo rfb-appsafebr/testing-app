@@ -1,0 +1,41 @@
+name: SAST - Semgrep (OSS)
+
+on:
+  pull_request: {}
+  push:
+    branches: ["main", "master"]
+  workflow_dispatch: {}
+
+permissions:
+  security-events: write
+  contents: read
+  actions: read
+
+jobs:
+  semgrep:
+    name: semgrep-oss/scan
+    runs-on: ubuntu-latest
+
+    container:
+      image: semgrep/semgrep
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep (SARIF)
+        run: |
+          semgrep scan --config auto --sarif -o semgrep.sarif .
+
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: semgrep.sarif
+
+      - name: Upload artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-sarif
+          path: semgrep.sarif
