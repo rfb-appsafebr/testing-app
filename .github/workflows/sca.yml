@@ -34,7 +34,6 @@ jobs:
           fail-build: true
           severity-cutoff: high
           output-format: sarif
-          output-file: grype.sarif
 
       # --- Upload to GitHub Security tab ---
       - name: Upload SARIF
