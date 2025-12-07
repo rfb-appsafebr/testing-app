@@ -25,7 +25,6 @@ jobs:
           format: "JSON"
           out: "dependency-check-report"
           args: >
-            --nvdValidForHours 24
             --data ~/.dependency-check
 
       - name: Upload reports
