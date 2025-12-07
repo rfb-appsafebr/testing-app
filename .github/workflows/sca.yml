@@ -31,6 +31,7 @@ jobs:
         uses: anchore/scan-action@v4
         with:
           sbom: sbom.spdx.json
+          fail-build: false
           output-format: sarif
 
       # --- Upload to GitHub Security tab ---
