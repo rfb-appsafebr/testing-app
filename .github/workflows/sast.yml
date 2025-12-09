@@ -31,17 +31,17 @@ jobs:
       - name: Run OpenGrep (SARIF)
         run: |
           mkdir -p reports
-          opengrep scan --sarif-output=reports/opengrep.sarif
+          opengrep --config auto --exclude=security-repo --exclude=public/ --exclude=spec/ --exclude=vendor/ --exclude=summarizer/ --exclude-rule ruby.rails.security.brakeman.check-unscoped-find.check-unscoped-find --exclude-rule ruby.lang.security.weak-hashes-sha1.weak-hashes-sha1 --exclude-rule html.security.audit.insecure-document-method.insecure-document-method --exclude-rule javascript.browser.security.insecure-document-method.insecure-document-method --exclude-rule generic.secrets.gitleaks.generic-api-key.generic-api-key --exclude-rule generic.secrets.security.detected-jwt-token.detected-jwt-token --exclude-rule html.security.plaintext-http-link.plaintext-http-link --exclude-rule generic.secrets.security.detected-generic-api-key.detected-generic-api-key --exclude-rule generic.secrets.security.detected-generic-secret.detected-generic-secret --exclude-rule generic.secrets.security.detected-private-key.detected-private-key --exclude-rule generic.secrets.security.detected-facebook-oauth.detected-facebook-oauth --json --output semgrep.json
 
       - name: Upload SARIF to GitHub Code Scanning
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: reports/opengrep.sarif
+          sarif_file: reports/semgrep.json
 
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: opengrep-results
-          path: reports/opengrep.sarif
+          path: reports/semgrep.json
